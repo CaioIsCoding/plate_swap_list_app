@@ -6,7 +6,10 @@ import { PlateCard } from './components/PlateCard';
 import { Dropzone } from './components/Dropzone';
 import { Download, RefreshCcw, Loader2 } from 'lucide-react';
 
-const API_BASE = "http://127.0.0.1:8000/api";
+// In specific production deploy (behind Nginx with /a1mini-swap prefix)
+// API is at /a1mini-swap/api
+// In dev, it's at localhost:8000/api
+const API_BASE = import.meta.env.PROD ? "/a1mini-swap/api" : "http://127.0.0.1:8000/api";
 
 function App() {
   const [playlist, setPlaylist] = useState([]);
@@ -75,7 +78,7 @@ function App() {
       const payload = { playlist };
       const res = await axios.post(`${API_BASE}/generate`, payload);
       if (res.data.download_url) {
-        const url = `http://127.0.0.1:8000${res.data.download_url}`;
+        const url = import.meta.env.PROD ? `/a1mini-swap/api${res.data.download_url}` : `http://127.0.0.1:8000${res.data.download_url}`;
         window.open(url, '_blank');
       }
     } catch (err) {

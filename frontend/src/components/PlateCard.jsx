@@ -59,7 +59,11 @@ export function PlateCard({ item, index, onRemove, onUpdateCount }) {
             {/* Thumbnail */}
             <div className="relative aspect-square bg-white m-2 rounded-md overflow-hidden flex items-center justify-center">
                 {item.image_url ? (
-                    <img src={`http://127.0.0.1:8000${item.image_url}`} alt="Plate" className="object-contain w-full h-full" />
+                    <img
+                        src={item.image_url.startsWith('http') ? item.image_url : (import.meta.env.PROD ? `/a1mini-swap/api${item.image_url}` : `http://127.0.0.1:8000${item.image_url}`)}
+                        alt="Plate"
+                        className="object-contain w-full h-full"
+                    />
                 ) : (
                     <div className="text-gray-400">No Image</div>
                 )}

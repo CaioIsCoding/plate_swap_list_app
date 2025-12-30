@@ -1,0 +1,25 @@
+[Unit]
+Description=SwapList App Backend
+After=network.target
+
+[Service]
+# User running the app (adjust if not ubuntu)
+User=ubuntu
+Group=ubuntu
+
+# Location of your app
+WorkingDirectory=/opt/swaplist
+
+# Environment variables (if needed)
+# Environment=PORT=8000
+
+# Command to start the app using 'uv'
+# Ensure full path to 'uv' is correct (e.g. /home/ubuntu/.cargo/bin/uv or /home/ubuntu/.local/bin/uv)
+ExecStart=/home/ubuntu/.local/bin/uv run -m uvicorn backend.app:app --host 127.0.0.1 --port 8000
+
+# Restart policy
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
