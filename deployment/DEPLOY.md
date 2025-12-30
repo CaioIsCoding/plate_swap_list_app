@@ -245,3 +245,47 @@ sudo nano /etc/ssh/sshd_config
 # Restart SSH
 sudo systemctl restart ssh
 ```
+
+## 15. Continuous Updates (The "Git" Way)
+Instead of SCPing files manually every time, use Git.
+
+### 15.1 Secure Setup (Deploy Keys)
+**Crucial:** Do NOT use your personal GitHub password or main SSH key. Use a **Deploy Key**.
+
+1.  **On the Server:** Generate a new key.
+    ```bash
+    ssh-keygen -t ed25519 -C "lightsail-deploy" -f ~/.ssh/github_deploy
+    # Press Enter for empty passphrase
+    cat ~/.ssh/github_deploy.pub
+    ```
+
+2.  **On GitHub:**
+    *   Go to your Repository -> **Settings** -> **Deploy keys**.
+    *   Click **Add deploy key**.
+    *   Paste the key you copied.
+    *   **Do NOT** check "Allow write access" (Read-only is safer).
+
+3.  **Configure Server:**
+    Tell SSH to use this key for GitHub.
+    ```bash
+    nano ~/.ssh/config
+    ```
+    Add this:
+    ```text
+    Host github.com
+      IdentityFile ~/.ssh/github_deploy
+    ```
+    Now `git checkout` / `git pull` will work securely without your personal credentials.
+
+### 15.2 The Workflow
+1.  **Local Machine:** Push changes (`git push`).
+2.  **Server:** Authenticate and clone (first time):
+    ```bash
+    git clone git@github.com:youruser/your-repo.git /opt/swaplist
+    ```
+3.  **Update:**
+    Run the script:
+    ```bash
+    chmod +x /opt/swaplist/deployment/update.sh
+    /opt/swaplist/deployment/update.sh
+    ```
