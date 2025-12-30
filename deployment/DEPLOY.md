@@ -85,17 +85,24 @@ Configure the backend to run automatically.
     ```
 
 ## 6. Setup Nginx (Reverse Proxy)
-Configure Nginx to serve the frontend and proxy the API.
+Instead of editing files manually, we'll install our config.
 
-1.  Edit your Nginx config (e.g., default site):
+1.  **Install the config:**
     ```bash
-    sudo nano /etc/nginx/sites-available/default
+    # Copy our ready-made config
+    sudo cp deployment/nginx.conf /etc/nginx/sites-available/swaplist
     ```
-2.  Insert the blocks from `deployment/nginx.conf` inside your `server { ... }` block (the one handling talktocaio.com).
-    *   Make sure `server_name` matches your domain.
-    *   Ensure the paths (`/opt/swaplist/...`) match where you put the files.
 
-3.  Test and restart Nginx:
+2.  **Enable it:**
+    ```bash
+    # Link it to sites-enabled
+    sudo ln -s /etc/nginx/sites-available/swaplist /etc/nginx/sites-enabled/
+    
+    # (Optional) Disable the default "Welcome to Nginx" page
+    sudo rm /etc/nginx/sites-enabled/default
+    ```
+
+3.  **Test and Restart:**
     ```bash
     sudo nginx -t
     sudo systemctl restart nginx
@@ -133,3 +140,108 @@ If the site says "Took too long to respond":
     *   **HTTP** (TCP 80)
     *   **HTTPS** (TCP 443)
 3.  By default, only SSH (22) is open. **You must add HTTP/HTTPS rules.**
+
+## 10. "Connection Refused" Error
+If the site says "Refused to connect":
+**This means the Firewall is OK, but Nginx is not running.**
+
+1.  SSH into the server.
+2.  Check Nginx status:
+    ```bash
+    sudo systemctl status nginx
+    ```
+    (If it says "inactive" or "failed", it's not running)
+3.  Check for config errors:
+    ```bash
+    sudo nginx -t
+    ```
+4.  Restart it:
+    ```bash
+    sudo systemctl restart nginx
+    ```
+
+## 11. Enable HTTPS (SSL)
+"Connection Refused" on **https://** happens if you haven't set up SSL yet.
+
+1.  Install Certbot:
+    ```bash
+    sudo apt install -y certbot python3-certbot-nginx
+    ```
+2.  Run it:
+    ```bash
+    sudo certbot --nginx -d talktocaio.com -d www.talktocaio.com
+    ```
+    (Follow the prompts. It will automatically update your Nginx config to support HTTPS.)
+
+## 12. "404 Not Found" Error
+If you see a white page with "404 Not Found":
+
+1.  **Check the URL:**
+    You must visit **https://talktocaio.com/a1mini-swap/**
+    (If you go to just talktocaio.com, it will 404 because we only configured the /a1mini-swap path).
+
+2.  **Check the Build:**
+    Ensure the files actually exist on the server:
+    ```bash
+    ls /opt/swaplist/frontend/dist
+    ```
+    (You should see `index.html` and an `assets` folder).
+    *   **If empty:** Go to `/opt/swaplist/frontend` and run `npm run build` again.
+
+3.  **Check Permissions:**
+    Nginx needs to read the files.
+    ```bash
+    sudo chmod -R 755 /opt/swaplist
+    ```
+
+## 13. "500 Internal Server Error"
+This usually means a configuration error in Nginx or a permission issue.
+
+1.  **Check Nginx Logs (The Truth):**
+    ```bash
+    sudo tail -n 20 /var/log/nginx/error.log
+    ```
+    *   If it says "rewrite or internal redirection cycle", check your `try_files` config.
+    *   If it says "permission denied", run the chmod command above.
+    *   If it says "directory index of ... is forbidden", ensure `index.html` exists in the `alias` folder.
+
+## 14. Security Hardening (Recommended)
+Now that it works, let's lock it down.
+
+### 14.1 Update Nginx Security
+Update your `default` config with the new security headers and rate limiting (already in `deployment/nginx.conf`).
+```bash
+# 1. Edit the file
+sudo nano /etc/nginx/sites-available/default
+# 2. Add the "limit_req_zone" line at the very top (outside server block)
+# 3. Add the "limit_req" and "add_header" lines inside server/location blocks
+# 4. Restart
+sudo systemctl restart nginx
+```
+
+### 14.2 Auto-Updates
+Keep the OS patched automatically.
+```bash
+sudo apt install -y unattended-upgrades
+sudo dpkg-reconfigure --priority=low unattended-upgrades
+```
+
+### 14.3 Block Brute Force (Fail2Ban)
+Ban IPs that try to guess your SSH password.
+```bash
+sudo apt install -y fail2ban
+sudo systemctl enable fail2ban
+sudo systemctl start fail2ban
+```
+
+### 14.4 Disable Password Login (SSH)
+Ensure only your Key File (.pem) works.
+```bash
+sudo nano /etc/ssh/sshd_config
+# Find and set:
+# PasswordAuthentication no
+# PubkeyAuthentication yes
+
+# Restart SSH
+sudo systemctl restart ssh
+```
