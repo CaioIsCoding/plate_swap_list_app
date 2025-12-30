@@ -124,3 +124,12 @@ To make **talktocaio.com** resolve to your LightSail instance:
         *   **Name:** `www`
         *   **Type:** CNAME
         *   **Value:** `talktocaio.com`
+
+## 9. Firewall (IMPORTANT)
+If the site says "Took too long to respond":
+
+1.  Go to **Lightsail Console** -> **Networking**.
+2.  Under **IPv4 Firewall**, make sure you allow:
+    *   **HTTP** (TCP 80)
+    *   **HTTPS** (TCP 443)
+3.  By default, only SSH (22) is open. **You must add HTTP/HTTPS rules.**
