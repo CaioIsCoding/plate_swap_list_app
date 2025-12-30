@@ -5,7 +5,9 @@ This guide assumes you have an AWS Lightsail instance (Ubuntu 22.04 or similar) 
 ## 1. Prepare the Server
 SSH into your instance:
 ```bash
-ssh ubuntu@<your-ip>
+# If using a key file (.pem):
+chmod 400 your-key.pem
+ssh -i path/to/your-key.pem ubuntu@<your-ip>
 ```
 
 Update and install dependencies (Nginx for web server, Node.js for frontend build):
@@ -27,7 +29,7 @@ source $HOME/.local/bin/env
 From your local machine (parent directory of `plate_swap_list_app`), run:
 ```bash
 # E.g. using scp
-scp -r plate_swap_list_app ubuntu@<your-ip>:~/swaplist
+scp -i path/to/your-key.pem -r plate_swap_list_app ubuntu@<your-ip>:~/swaplist
 ```
 
 ## 3. Setup Application Directory
