@@ -2,55 +2,34 @@
 
 A local web application for generating swapped 3MF files for 3D printing.
 
-## Requirements
-- Python 3.9+
-- Node.js (Latest)
-- NPM
-- [uv](https://docs.astral.sh/uv/) (Python package manager)
+## 🚀 Quick Start (Local Dev)
 
-## Installation
-(If you received this folder as a standalone package)
-
-1.  Ensure you have `uv` and Node.js installed.
-2.  Install Python dependencies:
-    ```bash
-    # This happens automatically when running with 'uv run',
-    # or explicitly:
-    uv sync
-    ```
-3.  Install Frontend dependencies (if not already present):
-    ```bash
-    cd frontend
-    npm install
-    cd ..
-    ```
-
-## Usage
-
-### Simple Start (Mac/Linux)
-Run the provided startup script:
+**Mac/Linux:**
 ```bash
 ./start_app.sh
 ```
-This will launch both the backend (via `uv`) and frontend servers.
-Open **http://localhost:5173** in your browser.
+This launches the Backend (FastAPI) and Frontend (Vite) automatically.
+Visit: **http://localhost:5173**
 
-### Manual Start
-1.  **Backend**:
-    ```bash
-    uv run -m uvicorn backend.app:app --reload --port 8000
-    ```
-2.  **Frontend**:
-    ```bash
-    cd frontend
-    npm run dev
-    ```
+---
 
-## Features
-- Drag & Drop `.3mf` files.
-- Reorder plates.
-- Set copy counts.
-- Generate unified Swap `.3mf`.
+## 🛠 Project Structure
 
-## Notes
-- Generated files are saved in `backend/static/` temporarily.
+*   **`backend/`**: Python FastAPI app.
+    *   Uses `uv` for dependency management.
+    *   `app.py`: Entry point.
+    *   `core.py`: Processing logic (3MF operations).
+*   **`frontend/`**: React + Vite app.
+    *   Uses `npm`.
+    *   `src/`: Components and Logic.
+*   **`deployment/`**: Configuration for Production.
+    *   `nginx.conf`: Web Server config.
+    *   `swaplist.service`: Systemd service.
+    *   `DEPLOY.md`: **Use this for AWS Lightsail Deployment.**
+
+## 📦 Requirements
+*   **Node.js** (Latest/Current)
+*   **uv** (Python tools)
+
+## ☁️ Deployment
+See **`deployment/DEPLOY.md`** for full instructions on setting up the AWS Lightsail server, Security, and Updates.
