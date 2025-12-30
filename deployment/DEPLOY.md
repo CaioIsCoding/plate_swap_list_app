@@ -12,8 +12,8 @@ Update and install dependencies (Nginx for web server, Node.js for frontend buil
 ```bash
 sudo apt update
 sudo apt install -y nginx unzip
-# Install Node.js (v18+)
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+# Install Node.js (Latest/Current)
+curl -fsSL https://deb.nodesource.com/setup_current.x | sudo -E bash -
 sudo apt install -y nodejs
 ```
 

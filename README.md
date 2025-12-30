@@ -4,7 +4,7 @@ A local web application for generating swapped 3MF files for 3D printing.
 
 ## Requirements
 - Python 3.9+
-- Node.js 18+
+- Node.js (Latest)
 - NPM
 - [uv](https://docs.astral.sh/uv/) (Python package manager)
 
