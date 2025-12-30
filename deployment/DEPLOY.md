@@ -27,9 +27,22 @@ source $HOME/.local/bin/env
 
 ## 2. Upload the Application
 From your local machine (parent directory of `plate_swap_list_app`), run:
+# PRO TIP: Zip it first to save time! (node_modules has thousands of files)
+# Run this locally:
+rm -rf plate_swap_list_app/frontend/node_modules
+rm -rf plate_swap_list_app/.venv
+tar -czf swaplist.tar.gz plate_swap_list_app
+
+# Send the single file
+scp -i path/to/your-key.pem swaplist.tar.gz ubuntu@<your-ip>:~
+```
+
+### 2.1 Extract on Server
+On the server:
 ```bash
-# E.g. using scp
-scp -i path/to/your-key.pem -r plate_swap_list_app ubuntu@<your-ip>:~/swaplist
+tar -xzf swaplist.tar.gz
+# Now you have the ~/plate_swap_list_app folder
+mv plate_swap_list_app swaplist
 ```
 
 ## 3. Setup Application Directory
@@ -92,3 +105,22 @@ Configure Nginx to serve the frontend and proxy the API.
 Visit **https://talktocaio.com/a1mini-swap/**
 - You should see the UI.
 - Dragging a file should upload correctly (check Network tab for calls to `/a1mini-swap/api/upload`).
+
+## 8. DNS (Route53)
+To make **talktocaio.com** resolve to your LightSail instance:
+
+1.  **Get your Static IP:**
+    *   In the Lightsail Console, go to **Networking**.
+    *   Create a static IP and attach it to your instance.
+
+2.  **Configure Route53:**
+    *   Go to the Route53 Console -> **Hosted Zones**.
+    *   Select `talktocaio.com`.
+    *   Create a **Record**:
+        *   **Record Name:** `talktocaio.com` (leave empty for root)
+        *   **Record Type:** A - Routes traffic to an IPv4 address
+        *   **Value:** <Your Lightsail Static IP>
+    *   (Optional) Create a CNAME for `www`:
+        *   **Name:** `www`
+        *   **Type:** CNAME
+        *   **Value:** `talktocaio.com`
